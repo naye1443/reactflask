@@ -1,7 +1,11 @@
 import os
-from flask import Flask, redirect, request, send_file, jsonify
+from flask import Flask, redirect, request, send_file, jsonify, render_template
 
 app = Flask(__name__)
+
+@app.route("/", methods=['GET'])
+def myindex():
+    return render_template("index.html", flask_token="Hello World")
 
 @app.route('/api', methods=['GET'])
 def home():

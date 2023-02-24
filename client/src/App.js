@@ -19,6 +19,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <p>My Token = {window.token}</p>
         <p>{data.Practice}</p>
         <Home/>
       </header>
