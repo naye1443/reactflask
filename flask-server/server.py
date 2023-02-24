@@ -3,6 +3,11 @@ from flask import Flask, redirect, request, send_file, jsonify
 
 app = Flask(__name__)
 
+@app.route('/api', methods=['GET'])
+def home():
+    print("This is working")
+    return {'Practice': 'practice Data'}
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
