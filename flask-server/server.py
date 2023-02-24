@@ -1,7 +1,16 @@
 import os
-from flask import Flask, redirect, request, send_file, jsonify
+from flask import Flask, redirect, request, send_file, jsonify, render_template
 
 app = Flask(__name__)
+
+@app.route("/", methods=['GET'])
+def myindex():
+    return render_template("index.html", flask_token="Hello World")
+
+@app.route('/api', methods=['GET'])
+def home():
+    print("This is working")
+    return {'Practice': 'practice Data'}
 
 
 @app.route('/upload', methods=['POST'])
@@ -46,4 +55,4 @@ def get_file(filename):
     return send_file(f"{directory}/{filename}")
 
 
-app.run(host='0.0.0.0', port=8080)
+app.run(host='0.0.0.0', port=80)
