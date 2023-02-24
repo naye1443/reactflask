@@ -55,4 +55,4 @@ def get_file(filename):
     return send_file(f"{directory}/{filename}")
 
 
-app.run(host='0.0.0.0', port=8080)
+app.run(host='0.0.0.0', port=80)
