@@ -20,11 +20,12 @@ def upload():
         # Print message to console indicating that the endpoint was hit
         print("POST /upload")
 
-        # Retrieve the file from the POST request
+        # Retrieve the file from the POST request, modify the file name to include the ".myjpeg"
+        # extension and save to directory
         file = request.files['form_file']
-
-        # Save the file to the specified directory
-        file.save(os.path.join("./files", file.filename))
+        directory = "./files"
+        file_name = f"{file.filename.split('.')[0]}.myjpeg"
+        file.save(os.path.join(directory, file_name))
 
     except Exception as ex:
         # If an exception occurs, print the error message to the console and return an error response
@@ -75,23 +76,20 @@ def download():
     # Print message to console indicating that the endpoint was hit
     print("GET /download")
 
-    # Extract the value of the 'id' query parameter from the request
+    # Extract the value of the 'id' query parameter from the request, and locate the directory if image
     file_id = request.args.get('id')
-
-    # Define the directory where the files are stored
     directory = './files'
-
-    # Create a file path using the directory and the file id, assuming that the files are named with a '.jpg' extension
-    file_path = os.path.join(directory, f"{file_id}.jpg")
+    file_name = f"{file_id}.myjpeg"
+    file_path = os.path.join(directory, file_name)
 
     # Check if the file exists at the given path
     if not os.path.exists(file_path):
         # If the file does not exist, abort the request with a 404 status code and an error message
         abort(404, f"File not found: {file_id}")
 
-    # If the file exists, send the file to the client with the specified file path
+    # If the file exists, send the file to the client with the specified file path and filename
     print(f"GET /files/{file_id}")
-    return send_file(file_path)
+    return send_file(file_path, as_attachment=True)
 
 
 @app.route('/delete')
@@ -108,11 +106,12 @@ def delete():
 
     # Get path to file
     directory = './files'
-    file_path = os.path.join(directory, f"{file_id}.jpg")
+    file_name = f"{file_id}.myjpeg"
+    file_path = os.path.join(directory, file_name)
 
     # Check if file exists
     if not os.path.exists(file_path):
-        abort(500, f"File not found: {file_id}")
+        abort(404, f"File not found: {file_id}")
 
     # Delete file
     os.remove(file_path)
