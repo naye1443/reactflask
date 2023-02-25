@@ -1,5 +1,8 @@
 import os
+import uuid
+
 from flask import Flask, redirect, request, send_file, jsonify, render_template, abort
+import storage
 
 app = Flask(__name__)
 
@@ -9,31 +12,35 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/upload', methods=['POST'])
+def upload_to_bucket(file, blob_name):
+    pass
+
+
 def upload():
     try:
-        # TODO
-        # Create hash for image
-        # Add owner, image name, image hash to database
-        # Add image to database saved as hash.myjpeg
-
-        # Print message to console indicating that the endpoint was hit
-        print("POST /upload")
-
-        # Retrieve the file from the POST request, modify the file name to include the ".myjpeg"
-        # extension and save to directory
+        # Retrieve the file from the POST request
         file = request.files['form_file']
-        directory = "./files"
-        file_name = f"{file.filename.split('.')[0]}.myjpeg"
-        file.save(os.path.join(directory, file_name))
+        user = request.files['user']
+        print(user)
+
+        # Create hash for image
+        image_id = uuid.uuid4()
+
+        # Add owner, image name, image hash to database
+        #storage.add_db_entry(user, file.filename, image_id)
+
+        # Upload the file to the bucket
+        blob_name = f"{image_id}.myjpeg"
+        #upload_to_bucket(file, blob_name)
+
+        # Return a success response
+        return {'status': 'success', 'message': 'File uploaded successfully'}
 
     except Exception as ex:
-        # If an exception occurs, print the error message to the console and return an error response
+        # If an exception occurs, return an error response
         print(f"Exception occurred: {ex}")
-        return {'status': 'error', 'message': str(ex)}
 
-        # If the file was successfully uploaded, return a success response
-    return {'status': 'success', 'message': 'File uploaded successfully'}
+        return {'status': 'error', 'message': str(ex)}
 
 
 @app.route('/files', methods=['GET'])
