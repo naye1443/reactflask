@@ -29,8 +29,11 @@ const ImageList = ({userName}) => {
     const uploadImage = async event => {
         event.preventDefault()
 
+        let user = "user"
+
         const formData = new FormData()
         formData.append('form_file', targetImage)
+        formData.append('user', user)
 
         const response = await fetch('/upload', {
             method: 'POST',

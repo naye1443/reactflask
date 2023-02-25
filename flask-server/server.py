@@ -12,26 +12,27 @@ def index():
     return render_template("index.html")
 
 
-def upload_to_bucket(file, blob_name):
-    pass
-
-
+@app.route("/upload", methods=['POST'])
 def upload():
     try:
         # Retrieve the file from the POST request
         file = request.files['form_file']
-        user = request.files['user']
-        print(user)
+        #user = request.files['user']
+        #print("user got")
+        #print(user)
+        user = "user"
 
-        # Create hash for image
-        image_id = uuid.uuid4()
+        # Create id for image
+        image_id = str(uuid.uuid4())
+        print(image_id)
 
-        # Add owner, image name, image hash to database
-        #storage.add_db_entry(user, file.filename, image_id)
+        # Add owner, image_name, and image_id to database
+        storage.add_db_entry(user, file.filename.split('.')[0], image_id)
 
         # Upload the file to the bucket
         blob_name = f"{image_id}.myjpeg"
-        #upload_to_bucket(file, blob_name)
+        storage.upload_to_bucket(file, blob_name, user)
+        print("added to bucket")
 
         # Return a success response
         return {'status': 'success', 'message': 'File uploaded successfully'}

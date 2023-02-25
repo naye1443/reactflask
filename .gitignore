@@ -7,3 +7,4 @@
 /.idea//dataSources/
 /.idea//dataSources.local.xml
 /venv
+/flask-server/venv
