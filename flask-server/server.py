@@ -1,58 +1,130 @@
 import os
-from flask import Flask, redirect, request, send_file, jsonify, render_template
+import uuid
+
+from flask import Flask, redirect, request, send_file, jsonify, render_template, abort
+import storage
 
 app = Flask(__name__)
 
+
 @app.route("/", methods=['GET'])
-def myindex():
-    return render_template("index.html", flask_token="Hello World")
-
-@app.route('/api', methods=['GET'])
-def home():
-    print("This is working")
-    return {'Practice': 'practice Data'}
+def index():
+    return render_template("index.html")
 
 
-@app.route('/upload', methods=['POST'])
+def upload_to_bucket(file, blob_name):
+    pass
+
+
 def upload():
     try:
-        print("POST /upload")
+        # Retrieve the file from the POST request
         file = request.files['form_file']
-        file.save(os.path.join("./files", file.filename))
+        user = request.files['user']
+        print(user)
+
+        # Create hash for image
+        image_id = uuid.uuid4()
+
+        # Add owner, image name, image hash to database
+        #storage.add_db_entry(user, file.filename, image_id)
+
+        # Upload the file to the bucket
+        blob_name = f"{image_id}.myjpeg"
+        #upload_to_bucket(file, blob_name)
+
+        # Return a success response
+        return {'status': 'success', 'message': 'File uploaded successfully'}
 
     except Exception as ex:
-        print(f"Exception occured: {ex}")
+        # If an exception occurs, return an error response
+        print(f"Exception occurred: {ex}")
 
-    return redirect('/')
+        return {'status': 'error', 'message': str(ex)}
 
 
-@app.route('/files')
+@app.route('/files', methods=['GET'])
 def list_of_files():
+    # TODO
+    # Get hashes associated to user_name from database and store as a list
+    # Foreach image metadata retrieved, set image object to corresponding values
+
+    # Print message to console indicating that the endpoint was hit
     print("GET /files")
 
     files = os.listdir("./files")
-
     images = []
 
     for file in files:
-        if file.endswith(".jpeg"):
-            images.append(file)
+        # Extract information about the image
+        name = file.split('.')[0]
+        id = hash(file)
+        size = os.path.getsize(os.path.join('./files', file))
 
-    data = {
-        'name': 'Test Image',
-        'id': '123123',
-        'size': '7.5',
-    }
+        # Create a dictionary representing the image
+        image_info = {
+            'name': name,
+            'id': id,
+            'size': size,
+        }
 
-    return jsonify(data)
+        # Adds image_info to images list
+        images.append(image_info)
+
+    return jsonify(images)
 
 
-@app.route('/files/<filename>')
-def get_file(filename):
+@app.route('/download')
+def download():
+    # TODO
+    # Check database where id == file_id
+    # return image in accordance to this
+
+    # Print message to console indicating that the endpoint was hit
+    print("GET /download")
+
+    # Extract the value of the 'id' query parameter from the request, and locate the directory if image
+    file_id = request.args.get('id')
     directory = './files'
+    file_name = f"{file_id}.myjpeg"
+    file_path = os.path.join(directory, file_name)
 
-    print(f"GET /files/{filename}")
-    return send_file(f"{directory}/{filename}")
+    # Check if the file exists at the given path
+    if not os.path.exists(file_path):
+        # If the file does not exist, abort the request with a 404 status code and an error message
+        abort(404, f"File not found: {file_id}")
+
+    # If the file exists, send the file to the client with the specified file path and filename
+    print(f"GET /files/{file_id}")
+    return send_file(file_path, as_attachment=True)
+
+
+@app.route('/delete')
+def delete():
+    # TODO
+    # Delete image where id == file_id
+    # Delete row in database where id == file_id
+
+    # Print message to console indicating that the endpoint was hit
+    print("GET /delete")
+
+    # Get file ID from query parameter
+    file_id = request.args.get('id')
+
+    # Get path to file
+    directory = './files'
+    file_name = f"{file_id}.myjpeg"
+    file_path = os.path.join(directory, file_name)
+
+    # Check if file exists
+    if not os.path.exists(file_path):
+        abort(404, f"File not found: {file_id}")
+
+    # Delete file
+    os.remove(file_path)
+
+    # Return success message
+    return "File deleted successfully"
 
 
 app.run(host='0.0.0.0', port=80)
