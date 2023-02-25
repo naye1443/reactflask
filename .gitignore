@@ -7,3 +7,5 @@
 /.idea//dataSources/
 /.idea//dataSources.local.xml
 /venv
+# Ignore Auth tokens
+/projecttwo_token.json

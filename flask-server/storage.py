@@ -1,11 +1,15 @@
 from google.cloud import datastore, storage
+from google.oauth2 import service_account
+
+SERVICE_ACCOUNT_FILE = '../auth/projecttwo_token.json'
+
+credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE)
 
 bucket_dir = "images/"
 bucket_name = "projecttwo-378620-images"
 
-datastore_client = datastore.Client()
-storage_client = storage.Client()
-
+datastore_client = datastore.Client(credentials.project_id,None,credentials)
+storage_client = storage.Client(credentials.project_id, None,credentials)
 
 def get_image_info(name="test"):
     query = datastore_client.query(name=name)
