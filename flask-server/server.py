@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from flask import Flask, redirect, request, send_file, jsonify, render_template, abort
@@ -14,20 +13,22 @@ def index():
 
 @app.route("/upload", methods=['POST'])
 def upload():
+    print("POST /upload")
+
     try:
         # Retrieve the file from the POST request
         file = request.files['form_file']
         #user = request.files['user']
-        #print("user got")
-        #print(user)
         user = "user"
 
         # Create id for image
-        image_id = str(uuid.uuid4())
+        image_id = str(uuid.uuid4().hex)
         print(image_id)
+        image_size = len(file.read())
 
         # Add owner, image_name, and image_id to database
-        storage.add_db_entry(user, file.filename.split('.')[0], image_id)
+        storage.add_db_entry(user, file.filename.split('.')[0], image_id, image_size)
+        print("added to db")
 
         # Upload the file to the bucket
         blob_name = f"{image_id}.myjpeg"
@@ -45,87 +46,63 @@ def upload():
 
 
 @app.route('/files', methods=['GET'])
-def list_of_files():
-    # TODO
-    # Get hashes associated to user_name from database and store as a list
-    # Foreach image metadata retrieved, set image object to corresponding values
-
+def get_images():
     # Print message to console indicating that the endpoint was hit
     print("GET /files")
 
-    files = os.listdir("./files")
-    images = []
-
-    for file in files:
-        # Extract information about the image
-        name = file.split('.')[0]
-        id = hash(file)
-        size = os.path.getsize(os.path.join('./files', file))
-
-        # Create a dictionary representing the image
-        image_info = {
-            'name': name,
-            'id': id,
-            'size': size,
-        }
-
-        # Adds image_info to images list
-        images.append(image_info)
+    images = storage.get_image_info("user")
 
     return jsonify(images)
 
 
 @app.route('/download')
 def download():
-    # TODO
-    # Check database where id == file_id
-    # return image in accordance to this
-
     # Print message to console indicating that the endpoint was hit
     print("GET /download")
 
-    # Extract the value of the 'id' query parameter from the request, and locate the directory if image
-    file_id = request.args.get('id')
-    directory = './files'
-    file_name = f"{file_id}.myjpeg"
-    file_path = os.path.join(directory, file_name)
+    try:
+        # Extract the value of the 'id' query parameter from the request, and locate the directory if image
+        file_id = request.args.get('id')
+        file_name = f"{file_id}.myjpeg"
+        result = storage.download_from_bucket(file_name)
 
-    # Check if the file exists at the given path
-    if not os.path.exists(file_path):
-        # If the file does not exist, abort the request with a 404 status code and an error message
-        abort(404, f"File not found: {file_id}")
+        if result is None:
+            print("File not found")
+            return 404
 
-    # If the file exists, send the file to the client with the specified file path and filename
-    print(f"GET /files/{file_id}")
-    return send_file(file_path, as_attachment=True)
+        print("test")
+
+        print(result)
+
+        return send_file(result, as_attachment=True)
+
+    except Exception as ex:
+        # If an exception occurs, return an error response
+        print(f"Exception occurred: {ex}")
+
+        return {'status': 'error', 'message': str(ex)}
 
 
 @app.route('/delete')
 def delete():
-    # TODO
-    # Delete image where id == file_id
-    # Delete row in database where id == file_id
-
     # Print message to console indicating that the endpoint was hit
     print("GET /delete")
 
-    # Get file ID from query parameter
-    file_id = request.args.get('id')
+    try:
+        # Extract the value of the 'id' query parameter from the request, and locate the directory if image
+        file_id = request.args.get('id')
+        directory = './owner/files'
+        file_name = f"{file_id}.myjpeg"
+        storage.remove_db_entry(file_id)
+        storage.delete_from_bucket(file_name)
 
-    # Get path to file
-    directory = './files'
-    file_name = f"{file_id}.myjpeg"
-    file_path = os.path.join(directory, file_name)
+        return {'status': 'success', 'message': 'File deleted successfully'}
 
-    # Check if file exists
-    if not os.path.exists(file_path):
-        abort(404, f"File not found: {file_id}")
+    except Exception as ex:
+        # If an exception occurs, return an error response
+        print(f"Exception occurred: {ex}")
 
-    # Delete file
-    os.remove(file_path)
-
-    # Return success message
-    return "File deleted successfully"
+        return {'status': 'error', 'message': str(ex)}
 
 
 app.run(host='0.0.0.0', port=80)

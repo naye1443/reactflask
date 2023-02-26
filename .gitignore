@@ -8,3 +8,5 @@
 /.idea//dataSources.local.xml
 /venv
 /flask-server/venv
+/flask-server/keyfile.json
+flask-server/keyfile.json

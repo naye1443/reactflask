@@ -53,16 +53,16 @@ const ImageList = ({userName}) => {
     }
 
     const deleteImage = async (id, name) => {
-        await fetch(`/delete?file_id=${name}`)
+        console.log(id)
+        console.log(name)
+        await fetch(`/delete?id=${id}`)
 
         await getImages()
     }
 
     const downloadImage = async (id, name) => {
         console.log(id)
-        const response = await fetch(`/download?file_id=${name}`)
-
-        console.log(response.headers)
+        const response = await fetch(`/download?id=${id}`)
 
         if (response.ok) {
             const blob = await response.blob();
