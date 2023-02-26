@@ -128,7 +128,7 @@ def download_from_bucket(blob_name):
     try:
         print(f"Downloading {blob_name} from bucket")
 
-        # Define bucket and blob objects and checks if it exists
+        # Define bucket and blob objects
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
 
@@ -138,19 +138,20 @@ def download_from_bucket(blob_name):
             return
 
         # Download the blob to memory
-        content = BytesIO()
-        blob.download_to_file(content)
+        in_mem_file = BytesIO()
+        blob.download_to_file(in_mem_file)
+        in_mem_file.seek(0)
 
-        # Convert the image to JPEG format
-        image = Image.open(content)
-        image = image.convert('RGB')
-        jpeg_data = BytesIO()
-        image.save(jpeg_data, format='JPEG')
-        jpeg_data.seek(0)
+        # Open the image file and convert it to JPEG
+        with Image.open(in_mem_file) as img:
+            img = img.convert('RGB')
+            out_mem_file = BytesIO()
+            img.save(out_mem_file, format='JPEG')
+            out_mem_file.seek(0)
 
         print(f"Downloaded {blob_name} from bucket")
 
-        return content.getvalue()
+        return out_mem_file
 
     except Exception as ex:
         # If an exception occurs, return an error response

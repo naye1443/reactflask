@@ -23,7 +23,6 @@ def upload():
 
         # Create id for image
         image_id = str(uuid.uuid4().hex)
-        print(image_id)
         image_size = len(file.read())
 
         # Add owner, image_name, and image_id to database
@@ -70,11 +69,7 @@ def download():
             print("File not found")
             return 404
 
-        print("test")
-
-        print(result)
-
-        return send_file(result, as_attachment=True)
+        return send_file(result, as_attachment=True, mimetype='image/jpeg', download_name=file_id)
 
     except Exception as ex:
         # If an exception occurs, return an error response
