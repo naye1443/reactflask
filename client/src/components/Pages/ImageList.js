@@ -11,9 +11,9 @@ const ImageList = ({userName}) => {
     }, []);
 
     const getImages = async () => {
-        let owner = "test"
+        let user = localStorage.getItem("email")
 
-        await fetch("/files")
+        await fetch(`/files?user=${user}`)
         .then(x => x.json())
         .then(x =>
         {
@@ -29,13 +29,14 @@ const ImageList = ({userName}) => {
     const uploadImage = async event => {
         event.preventDefault()
 
-        let user = "user"
+        let user = localStorage.getItem("email")
+        console.log(user)
 
         const formData = new FormData()
         formData.append('form_file', targetImage)
         formData.append('user', user)
 
-        const response = await fetch('/upload', {
+        const response = await fetch(`/upload`, {
             method: 'POST',
             mode: 'cors',
             body: formData
@@ -53,16 +54,17 @@ const ImageList = ({userName}) => {
     }
 
     const deleteImage = async (id, name) => {
-        console.log(id)
-        console.log(name)
-        await fetch(`/delete?id=${id}`)
+        let user = localStorage.getItem("email")
+
+        await fetch(`/delete?id=${id}&user=${user}`)
 
         await getImages()
     }
 
     const downloadImage = async (id, name) => {
-        console.log(id)
-        const response = await fetch(`/download?id=${id}`)
+        let user = localStorage.getItem("email")
+
+        const response = await fetch(`/download?id=${id}&user=${user}`)
 
         if (response.ok) {
             const blob = await response.blob();
