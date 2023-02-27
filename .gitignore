@@ -10,3 +10,5 @@
 /flask-server/venv
 /flask-server/keyfile.json
 flask-server/keyfile.json
+# ignore node_modules
+/node_modules
