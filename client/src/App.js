@@ -1,12 +1,11 @@
-import {useEffect, useState} from "react";
 import './App.css';
-import Home from "./components/Pages/Home";
+import AppRouter from "./components/Nav/AppRouter";
 function App() {
 
   return (
     <div className="App">
       <header className="App-header">
-        <Home/>
+        <AppRouter/>
       </header>
     </div>
   );

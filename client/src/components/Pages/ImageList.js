@@ -1,7 +1,9 @@
 import "../../Style/ImageList.css"
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const ImageList = ({userName}) => {
+    const navigate = useNavigate()
     const [images, setImages] = useState([])
     const [targetImage, setTargetImage] = useState(null)
     const [listItems, setListItems] = useState(null)
@@ -11,9 +13,9 @@ const ImageList = ({userName}) => {
     }, []);
 
     const getImages = async () => {
-        let owner = "test"
+        let user = localStorage.getItem("email")
 
-        await fetch("/files")
+        await fetch(`/files?user=${user}`)
         .then(x => x.json())
         .then(x =>
         {
@@ -29,10 +31,14 @@ const ImageList = ({userName}) => {
     const uploadImage = async event => {
         event.preventDefault()
 
+        let user = localStorage.getItem("email")
+        console.log(user)
+
         const formData = new FormData()
         formData.append('form_file', targetImage)
+        formData.append('user', user)
 
-        const response = await fetch('/upload', {
+        const response = await fetch(`/upload`, {
             method: 'POST',
             mode: 'cors',
             body: formData
@@ -50,16 +56,17 @@ const ImageList = ({userName}) => {
     }
 
     const deleteImage = async (id, name) => {
-        await fetch(`/delete?file_id=${name}`)
+        let user = localStorage.getItem("email")
+
+        await fetch(`/delete?id=${id}&user=${user}`)
 
         await getImages()
     }
 
     const downloadImage = async (id, name) => {
-        console.log(id)
-        const response = await fetch(`/download?file_id=${name}`)
+        let user = localStorage.getItem("email")
 
-        console.log(response.headers)
+        const response = await fetch(`/download?id=${id}&user=${user}`)
 
         if (response.ok) {
             const blob = await response.blob();
@@ -75,6 +82,12 @@ const ImageList = ({userName}) => {
         else {
             console.log(`Error downloading image: ${response.status} ${response.statusText}`);
         }
+    }
+
+    const logout = () => {
+        localStorage.setItem("email", "")
+        localStorage.setItem("logged_in", "false")
+        navigate("/")
     }
 
     const createList = () => {
@@ -108,8 +121,12 @@ const ImageList = ({userName}) => {
 
             <br></br>
 
-            <div className="upload-container">
-                <button className="update" onClick={() => getImages()}>UPDATE</button>
+            <div>
+                <button onClick={() => getImages()}>UPDATE</button>
+            </div>
+
+            <div>
+                <button onClick={() => logout()}>LOGOUT</button>
             </div>
 
             <br></br>
