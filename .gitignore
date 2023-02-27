@@ -7,5 +7,6 @@
 /.idea//dataSources/
 /.idea//dataSources.local.xml
 /venv
-# Ignore Auth tokens
-/projecttwo_token.json
+/flask-server/venv
+/flask-server/keyfile.json
+flask-server/keyfile.json

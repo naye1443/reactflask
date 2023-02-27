@@ -1,8 +1,11 @@
 import "../../Style/Home.css"
+import { useNavigate } from "react-router-dom"
 import {useEffect, useState} from "react";
 import ImageList from "./ImageList";
 
 const Home = () => {
+    const navigate = useNavigate()
+
     useEffect(() => {
         createImageList();
     }, []);
@@ -14,7 +17,7 @@ const Home = () => {
                 userName = {userName}
             />
         )
-    };
+    }
 
     return (
         <div>
