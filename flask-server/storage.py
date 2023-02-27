@@ -2,6 +2,7 @@ from io import BytesIO
 from PIL import Image
 from google.cloud import datastore, storage
 import os
+import bcrypt as bcrypt
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = ".\\keyfile.json"
 
@@ -15,7 +16,7 @@ storage_client = storage.Client()
 
 def get_image_info(name="user"):
     try:
-        print(f"Retrieving user: {name}'s images from database")
+        print(f"Retrieving images from database for user: {name}")
 
         # Defines query to search for images where owner = name
         query = datastore_client.query(kind="images")
@@ -33,7 +34,7 @@ def get_image_info(name="user"):
 
             image_info.append(info)
 
-        print(f"Retrieved user: {name}'s images from database")
+        print(f"Retrieved images from database for user: {name}")
         print(image_info)
 
         return image_info
@@ -46,7 +47,7 @@ def get_image_info(name="user"):
 
 def add_db_entry(owner, image_name, image_id, image_size):
     try:
-        print(f"Adding {image_name} to database")
+        print(f"Adding to database: {image_name}")
 
         # Defines a new entity where key = image_id
         entity = datastore.Entity(key=datastore_client.key("images", image_id))
@@ -62,7 +63,7 @@ def add_db_entry(owner, image_name, image_id, image_size):
         # Adds entity to database
         datastore_client.put(entity)
 
-        print(f"Added {image_name} to database")
+        print(f"Added to database: {image_name}")
 
     except Exception as ex:
         # If an exception occurs, return an error response
@@ -71,7 +72,7 @@ def add_db_entry(owner, image_name, image_id, image_size):
 
 def remove_db_entry(image_id):
     try:
-        print(f"Removing {image_id} from database")
+        print(f"Removing from database {image_id}")
 
         # Defines the key to be removed from database
         key = datastore_client.key("images", image_id)
@@ -79,7 +80,7 @@ def remove_db_entry(image_id):
         # Deletes the entity with the matching key from database
         datastore_client.delete(key)
 
-        print(f"Removed {image_id} from database")
+        print(f"Removed from database {image_id}")
 
     except Exception as ex:
         # If an exception occurs, return an error response
@@ -88,7 +89,7 @@ def remove_db_entry(image_id):
 
 def upload_to_bucket(file, blob_name, owner):
     try:
-        print(f"Uploading {owner}/{blob_name} to bucket")
+        print(f"Uploading to bucket: {owner}/{blob_name} ")
 
         # Set file pointer to beginning of file
         file.seek(0)
@@ -105,7 +106,7 @@ def upload_to_bucket(file, blob_name, owner):
         # Upload file to blob in the bucket
         blob.upload_from_file(file)
 
-        print(f"Uploaded {owner}/{blob_name} to bucket")
+        print(f"Uploaded to bucket {owner}/{blob_name}")
 
     except Exception as ex:
         # If an exception occurs, return an error response
@@ -114,7 +115,7 @@ def upload_to_bucket(file, blob_name, owner):
 
 def delete_from_bucket(blob_name, owner="user"):
     try:
-        print(f"Removing {owner}/{blob_name} from bucket")
+        print(f"Removing from bucket:  {owner}/{blob_name}")
         # Define bucket and blob objects
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(f"{owner}/{blob_name}")
@@ -122,7 +123,7 @@ def delete_from_bucket(blob_name, owner="user"):
         # Delete blob from the bucket
         blob.delete()
 
-        print(f"Removed {owner}/{blob_name} from bucket")
+        print(f"Removed from bucket: {owner}/{blob_name}")
 
     except Exception as ex:
         # If an exception occurs, return an error response
@@ -131,7 +132,7 @@ def delete_from_bucket(blob_name, owner="user"):
 
 def download_from_bucket(blob_name, owner="user"):
     try:
-        print(f"Downloading {owner}/{blob_name} from bucket")
+        print(f"Downloading from bucket: {owner}/{blob_name}")
 
         # Define bucket and blob objects
         bucket = storage_client.bucket(bucket_name)
@@ -139,7 +140,7 @@ def download_from_bucket(blob_name, owner="user"):
 
         # Exits if blob does not exist
         if not blob.exists():
-            print(f"Blob {owner}/{blob_name} does not exist")
+            print(f"Blob does not exist: {owner}/{blob_name}")
             return
 
         # Download the blob to memory
@@ -154,7 +155,7 @@ def download_from_bucket(blob_name, owner="user"):
             img.save(out_mem_file, format='JPEG')
             out_mem_file.seek(0)
 
-        print(f"Downloaded {owner}/{blob_name} from bucket")
+        print(f"Downloaded from bucket: {owner}/{blob_name}")
 
         return out_mem_file
 
@@ -166,7 +167,12 @@ def download_from_bucket(blob_name, owner="user"):
 
 def create_account(email, password, first_name, last_name):
     try:
-        print(f"Adding {email} to database")
+        print(f"Adding to database: {email}")
+
+        # Hashes user password before adding to database
+        password_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        password_hash = bcrypt.hashpw(password_bytes, salt)
 
         # Defines a new entity where key = email
         entity = datastore.Entity(key=datastore_client.key("users", email))
@@ -174,7 +180,7 @@ def create_account(email, password, first_name, last_name):
         # Sets values for user account
         entity.update({
             'email': email,
-            'password': password,
+            'password': password_hash,
             'first_name': first_name,
             'last_name': last_name
         })
@@ -182,7 +188,7 @@ def create_account(email, password, first_name, last_name):
         # Adds user to database
         datastore_client.put(entity)
 
-        print(f"Added {email} to database")
+        print(f"Added to database: {email}")
 
     except Exception as ex:
         # If an exception occurs, return an error response
@@ -191,22 +197,24 @@ def create_account(email, password, first_name, last_name):
 
 def authenticate_account(email, password):
     try:
-        print(f"Authenticating {email}")
+        print(f"Authenticating: {email}")
 
         # Queries for users information and fetches first match
         query = datastore_client.query(kind="users")
         query.add_filter("email", "=", email)
-        query.add_filter("password", "=", password)
-        result = query.fetch(1)
-        user = list(result)
+        query_result = query.fetch(1)
+        user = list(query_result)
 
-        # Returns False if user is not found,
-        if not user:
+        # Compares hashed password from query to password to
+        password_bytes = password.encode('utf-8')
+        password_hash = user[0]["password"]
+        result = bcrypt.checkpw(password_bytes, password_hash)
+
+        # Returns False if user is not found, elif user is found, return True
+        if not result:
             return False
-
-        # elif user is found, return True
         elif user[0]["email"] == email:
-            print(f"User found in database")
+            print(f"Authenticated: {email}")
             return True
 
     except Exception as ex:
