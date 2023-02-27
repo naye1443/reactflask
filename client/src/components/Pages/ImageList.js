@@ -59,8 +59,8 @@ const ImageList = ({userName}) => {
         let user = localStorage.getItem("email")
 
         await fetch(`/delete?id=${id}&user=${user}`)
+            .then(await getImages())
 
-        await getImages()
     }
 
     const downloadImage = async (id, name) => {
