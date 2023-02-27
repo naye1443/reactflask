@@ -8,7 +8,6 @@
 /.idea//dataSources.local.xml
 /venv
 /flask-server/venv
-/flask-server/keyfile.json
-flask-server/keyfile.json
+keyfile.json
 # ignore node_modules
 node_modules

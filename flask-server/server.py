@@ -1,7 +1,7 @@
 import uuid
 
 from flask import Flask, redirect, request, send_file, jsonify, render_template, abort
-#import storage
+import storage
 
 app = Flask(__name__)
 
