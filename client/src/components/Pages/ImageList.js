@@ -1,7 +1,9 @@
 import "../../Style/ImageList.css"
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const ImageList = ({userName}) => {
+    const navigate = useNavigate()
     const [images, setImages] = useState([])
     const [targetImage, setTargetImage] = useState(null)
     const [listItems, setListItems] = useState(null)
@@ -82,6 +84,12 @@ const ImageList = ({userName}) => {
         }
     }
 
+    const logout = () => {
+        localStorage.setItem("email", "")
+        localStorage.setItem("logged_in", "false")
+        navigate("/")
+    }
+
     const createList = () => {
         return (
             <div className="image-list">
@@ -113,8 +121,12 @@ const ImageList = ({userName}) => {
 
             <br></br>
 
-            <div className="upload-container">
-                <button className="update" onClick={() => getImages()}>UPDATE</button>
+            <div>
+                <button onClick={() => getImages()}>UPDATE</button>
+            </div>
+
+            <div>
+                <button onClick={() => logout()}>LOGOUT</button>
             </div>
 
             <br></br>

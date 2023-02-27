@@ -18,8 +18,8 @@
 
 .image-grid {
     display: grid;
-    background-color: #1a1c20;
-    border: 1px solid #1a1c20;
+    background-color: #2a2c35;
+    border: 1px solid #2a2c35;
     margin-bottom: 10px;
     height: 40px;
     grid-template-columns: 2fr 2fr 0.5fr 0.5fr;
@@ -29,7 +29,19 @@
     border: none;
     font-size: 12px;
     color: #a1aabc;
-    background-color: #1a1c20;
+    background-color: #2a2c35;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0;
+    letter-spacing: 0.2px;
+    outline: 0;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+}
+
+.button:hover {
+    color: #74cf65;
 }
 
 .update{

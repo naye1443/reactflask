@@ -19,22 +19,10 @@ const Home = () => {
         )
     }
 
-    const logout = () => {
-        localStorage.setItem("email", "")
-        localStorage.setItem("logged_in", "false")
-        navigate("/")
-    }
-
-
-
     return (
         <div>
             <h2 className="list-title">Images</h2>
             <ImageList/>
-
-            <div>
-                <button onClick={() => logout()}>LOGOUT</button>
-            </div>
         </div>
         
     );
