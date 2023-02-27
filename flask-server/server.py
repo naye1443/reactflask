@@ -123,8 +123,8 @@ def login():
         if result is True:
             result_message = "success"
             print("Successfully authenticated account")
-
-        print("User not authenticated")
+        else:
+            print("User not authenticated")
 
         return jsonify(result_message)
 
