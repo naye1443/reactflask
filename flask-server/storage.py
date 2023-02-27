@@ -3,14 +3,14 @@ from PIL import Image
 from google.cloud import datastore, storage
 import os
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = ".\\keyfile.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "./keyfile.json"
 
 bucket_dir = "images/"
 project_id = "projecttwo-378620"
 bucket_name = f"{project_id}-images"
 
-datastore_client = datastore.Client(credentials.project_id,None,credentials)
-storage_client = storage.Client(credentials.project_id, None,credentials)
+datastore_client = datastore.Client()
+storage_client = storage.Client()
 
 def get_image_info(name="user"):
     try:
