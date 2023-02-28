@@ -1,7 +1,7 @@
 from io import BytesIO
 from PIL import Image
-import google.cloud.storage as storage
-import google.cloud.datastore as datastore
+import google.cloud.storage as storage  # storage in buckets, This stores images
+import google.cloud.datastore as datastore  # storage is for image metadata
 import os
 import bcrypt as bcrypt
 
