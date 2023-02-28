@@ -4,7 +4,7 @@ from google.cloud import datastore, storage
 import os
 import bcrypt as bcrypt
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "./keyfile.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "../auth/keyfile.json"
 
 bucket_dir = "images/"
 project_id = "projecttwo-378620"
