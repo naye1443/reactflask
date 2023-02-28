@@ -2,8 +2,7 @@
 ## Reason for application
 ---
 The motive behind the creation of this application was to create a serverless application that utilizes both Blob storage with and non-Relational persistance to store images. The application interfaces with both systems to simulate a production-ready application.
-## Important Info
----
+# Important Info
 [Here](https://blog.ldtalentwork.com/2019/11/29/how-to-serve-a-reactapp-with-a-flask-server/) is how to Build react files into a flask appliaction.
 ## Steps of creating a container registery image
 ---
@@ -39,3 +38,7 @@ Technologies include:
 |python/flask| Used to handle http request|
 |google-cloud-storage| Used to store images buckets|
 |google-cloud-datastore| Used to store metadata|
+
+## Future improvements
+---
+In the future, we would like to automate the deployment for this application. We would also like traffic to be split evenly between users and have multiple instance running in parallel.
