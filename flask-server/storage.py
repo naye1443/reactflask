@@ -1,6 +1,7 @@
 from io import BytesIO
 from PIL import Image
-from google.cloud import datastore, storage
+import google.cloud.storage as storage
+import google.cloud.datastore as datastore
 import os
 import bcrypt as bcrypt
 
